@@ -1,0 +1,404 @@
+# 🐚 Bash Shell Scripting Cheat Sheet
+
+A practical collection of the most commonly used Bash shell scripting commands, syntax, and examples.
+
+This guide is designed for Linux beginners, system administrators, DevOps learners, and developers who want to automate repetitive tasks.
+
+## 📚 Table of Contents
+
+- [Introduction](#-introduction)
+- [1. Variables](#1-variables)
+- [2. Input and Output](#2-input-and-output)
+- [3. Conditional Statements](#3-conditional-statements)
+- [4. Loops](#4-loops)
+- [5. Functions](#5-functions)
+- [6. File and Directory Operations](#6-file-and-directory-operations)
+- [7. Text Processing](#7-text-processing)
+- [8. Command-Line Arguments](#8-command-line-arguments)
+- [9. Exit Status and Error Handling](#9-exit-status-and-error-handling)
+- [10. Useful System Commands](#10-useful-system-commands)
+- [11. Practical Automation Script](#11-practical-automation-script)
+- [12. Running a Shell Script](#12-running-a-shell-script)
+
+## 🐚 Introduction
+
+Shell scripting allows you to automate commands using a script file instead of typing each command manually.
+
+**Common use cases:**
+- Automating backups
+- Monitoring disk and memory usage
+- Managing files and directories
+- Deploying applications
+- Automating Linux administration tasks
+- Running scheduled jobs with cron
+
+## 1. Variables
+
+Variables store values that can be reused throughout a script.
+
+```bash
+#!/bin/bash
+
+name="Vijay"
+age=25
+
+echo "Name: $name"
+echo "Age: $age"
+```
+
+| Syntax | Description |
+|---|---|
+| `name="Vijay"` | Creates a variable |
+| `$name` | Accesses a variable's value |
+| `readonly name="Vijay"` | Declares a read-only variable |
+| `unset name` | Removes a variable |
+
+**Note:** Do not put spaces around `=` when assigning shell variables.
+
+## 2. Input and Output
+
+| Command | Description |
+|---|---|
+| `echo "Hello"` | Prints text |
+| `printf "Hello\n"` | Prints formatted output |
+| `read name` | Reads user input |
+| `read -p "Name: " name` | Displays a prompt and reads input |
+| `date` | Displays the current date and time |
+| `whoami` | Displays the current username |
+
+### Example
+
+```bash
+#!/bin/bash
+
+read -p "Enter your name: " name
+echo "Welcome, $name!"
+```
+
+## 3. Conditional Statements
+
+Use `if`, `elif`, and `else` to make decisions.
+
+```bash
+#!/bin/bash
+
+read -p "Enter your age: " age
+
+if [[ "$age" -ge 18 ]]; then
+    echo "You are an adult."
+else
+    echo "You are under 18."
+fi
+```
+
+### Common comparison operators
+
+| Operator | Meaning |
+|---|---|
+| `-eq` | Equal to (numbers) |
+| `-ne` | Not equal to (numbers) |
+| `-gt` | Greater than |
+| `-lt` | Less than |
+| `-ge` | Greater than or equal to |
+| `-le` | Less than or equal to |
+| `==` | String equality inside `[[ ]]` |
+| `!=` | String inequality inside `[[ ]]` |
+
+### File tests
+
+```bash
+[[ -f file.txt ]]  # Regular file exists
+[[ -d myfolder ]]  # Directory exists
+[[ -e path ]]      # Path exists
+[[ -r file.txt ]]  # File is readable
+[[ -w file.txt ]]  # File is writable
+[[ -x script.sh ]] # File is executable
+```
+
+## 4. Loops
+
+Loops execute commands repeatedly.
+
+### For loop
+
+```bash
+#!/bin/bash
+
+for i in {1..5}; do
+    echo "Number: $i"
+done
+```
+
+### While loop
+
+```bash
+#!/bin/bash
+
+count=1
+
+while [[ "$count" -le 5 ]]; do
+    echo "Count: $count"
+    ((count++))
+done
+```
+
+### Loop control
+
+```bash
+break      # Exits the current loop
+continue   # Skips to the next iteration
+```
+
+## 5. Functions
+
+Functions group commands into reusable blocks.
+
+```bash
+#!/bin/bash
+
+greet() {
+    echo "Hello, $1!"
+}
+
+greet "Vijay"
+```
+
+Output:
+
+```text
+Hello, Vijay!
+```
+
+| Syntax | Description |
+|---|---|
+| `function_name() { ... }` | Defines a function |
+| `$1`, `$2` | First and second function arguments |
+| `return 0` | Returns a success status |
+
+## 6. File and Directory Operations
+
+| Command | Description |
+|---|---|
+| `pwd` | Shows the current directory |
+| `ls -l` | Lists files with details |
+| `mkdir -p logs` | Creates a directory and missing parents |
+| `touch file.txt` | Creates an empty file if it doesn't exist |
+| `cp source.txt backup.txt` | Copies a file |
+| `mv old.txt new.txt` | Moves or renames a file |
+| `rm file.txt` | Deletes a file |
+| `find . -name "*.log"` | Finds matching filenames |
+| `cat file.txt` | Displays file contents |
+| `wc -l file.txt` | Counts lines in a file |
+
+**Safety tip:** Use extra care with `rm`, wildcards such as `*`, and paths built from variables.
+
+## 7. Text Processing
+
+These commands are useful when processing logs, configuration files, and command output.
+
+| Command | Description |
+|---|---|
+| `grep "error" app.log` | Searches for matching lines |
+| `grep -i "error" app.log` | Searches without case sensitivity |
+| `sort names.txt` | Sorts lines |
+| `uniq names.txt` | Removes adjacent duplicate lines |
+| `cut -d',' -f1 data.csv` | Extracts the first comma-separated field |
+| `awk '{print $1}' file.txt` | Prints the first whitespace-separated field |
+| `sed 's/old/new/g' file.txt` | Prints text with substitutions |
+| `head -n 10 file.txt` | Displays the first 10 lines |
+| `tail -n 10 file.txt` | Displays the last 10 lines |
+| `tail -f app.log` | Follows a growing log file |
+
+### Pipes and redirection
+
+```bash
+ls -l | grep ".txt"
+```
+
+Sends the output of `ls -l` to `grep`.
+
+```bash
+echo "Hello" > output.txt
+```
+
+Writes output to a file, replacing its previous contents.
+
+```bash
+echo "Another line" >> output.txt
+```
+
+Appends output to a file.
+
+```bash
+command 2> error.log
+```
+
+Redirects standard error to a file.
+
+## 8. Command-Line Arguments
+
+Arguments allow you to pass values when running a script.
+
+```bash
+#!/bin/bash
+
+echo "Script name: $0"
+echo "First argument: $1"
+echo "Second argument: $2"
+echo "All arguments: $@"
+echo "Number of arguments: $#"
+```
+
+Run the script:
+
+```bash
+bash script.sh hello world
+```
+
+### Useful special variables
+
+| Variable | Description |
+|---|---|
+| `$0` | Script name |
+| `$1`, `$2` | Positional arguments |
+| `"$@"` | All arguments, preserving argument boundaries |
+| `$#` | Number of arguments |
+| `$?` | Exit status of the previous command |
+| `$$` | Process ID of the current shell |
+
+## 9. Exit Status and Error Handling
+
+A successful command usually exits with status `0`; a nonzero status indicates failure.
+
+```bash
+#!/bin/bash
+
+mkdir -p backup
+
+if [[ $? -eq 0 ]]; then
+    echo "Command succeeded."
+else
+    echo "Command failed."
+fi
+```
+
+A cleaner approach is to check the command directly:
+
+```bash
+if mkdir -p backup; then
+    echo "Directory is ready."
+else
+    echo "Could not create directory." >&2
+    exit 1
+fi
+```
+
+### Useful scripting options
+
+```bash
+set -e   # Exit on many unhandled command failures
+set -u   # Treat unset variables as errors
+set -o pipefail  # Fail a pipeline if a command fails
+```
+
+These options are useful, but they have edge cases. Test scripts carefully and handle expected failures explicitly.
+
+## 10. Useful System Commands
+
+| Command | Description |
+|---|---|
+| `df -h` | Shows filesystem disk usage |
+| `free -h` | Shows memory usage |
+| `uptime` | Shows system uptime and load |
+| `ps aux` | Lists running processes |
+| `pgrep nginx` | Searches for processes by name |
+| `ip addr` | Shows network interfaces and addresses |
+| `curl -I https://example.com` | Fetches HTTP response headers |
+| `tar -czf backup.tar.gz folder/` | Creates a compressed archive |
+| `tar -xzf backup.tar.gz` | Extracts a gzip-compressed archive |
+| `sleep 5` | Waits five seconds |
+
+## 11. Practical Automation Script
+
+### Disk Usage Monitor
+
+This script checks filesystem usage and warns when any filesystem reaches a chosen threshold.
+
+Save it as `disk_monitor.sh`:
+
+```bash
+#!/bin/bash
+
+set -u
+
+THRESHOLD=80
+
+df -P | awk 'NR > 1 {print $5, $6}' |
+while read -r usage mountpoint; do
+    percent=${usage%\%}
+
+    if [[ "$percent" =~ ^[0-9]+$ ]] &&
+       (( percent >= THRESHOLD )); then
+        printf 'WARNING: %s is %s full\n' \
+            "$mountpoint" "$usage"
+    fi
+done
+```
+
+Run it:
+
+```bash
+chmod +x disk_monitor.sh
+./disk_monitor.sh
+```
+
+The script prints a warning for filesystems at or above 80% usage. Adjust `THRESHOLD` as needed.
+
+## 12. Running a Shell Script
+
+### Step 1: Create a script
+
+```bash
+nano script.sh
+```
+
+### Step 2: Add a shebang
+
+```bash
+#!/bin/bash
+
+echo "Hello from Bash!"
+```
+
+### Step 3: Make it executable
+
+```bash
+chmod +x script.sh
+```
+
+### Step 4: Run the script
+
+```bash
+./script.sh
+```
+
+Alternatively:
+
+```bash
+bash script.sh
+```
+
+## 📖 Useful Resources
+
+- [GNU Bash Manual](https://www.gnu.org/software/bash/manual/)
+- [ShellCheck](https://www.shellcheck.net/) — checks scripts for common problems
+- [Linux Documentation](https://www.kernel.org/doc/html/latest/)
+- [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)
+
+## ⭐ Contributing
+
+Suggestions and improvements are welcome. Feel free to fork this repository and submit a pull request.
+
+If this guide helps you learn Bash scripting, consider giving the repository a star!
+
+**Happy Scripting! 🚀**
