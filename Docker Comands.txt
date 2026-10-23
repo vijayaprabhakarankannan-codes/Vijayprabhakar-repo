@@ -1,0 +1,176 @@
+# 🐳 Docker Commands Cheat Sheet
+
+A beginner-friendly collection of essential Docker commands with examples and explanations.
+
+Perfect for Linux users, developers, DevOps beginners, and anyone learning containerization.
+
+## 📚 Table of Contents
+
+- [What is Docker?](#-what-is-docker)
+- [1. Docker Information](#1-docker-information)
+- [2. Image Commands](#2-image-commands)
+- [3. Container Commands](#3-container-commands)
+- [4. Container Management](#4-container-management)
+- [5. Logs and Inspection](#5-logs-and-inspection)
+- [6. Cleanup Commands](#6-cleanup-commands)
+- [7. Docker Compose](#7-docker-compose)
+- [⚠️ Safety Tips](#️-safety-tips)
+
+## 🐳 What is Docker?
+
+Docker is a platform that allows you to build, run, and manage applications inside containers.
+
+**Key concepts:**
+- **Image:** A template used to create containers.
+- **Container:** A running or stopped instance of an image.
+- **Dockerfile:** A file containing instructions to build an image.
+- **Docker Compose:** A tool for managing multi-container applications.
+
+## 1. Docker Information
+
+| Command | Description |
+|---|---|
+| `docker --version` | Displays the Docker version |
+| `docker info` | Displays system-wide Docker information |
+| `docker help` | Lists Docker commands |
+| `docker ps` | Lists running containers |
+| `docker ps -a` | Lists all containers, including stopped ones |
+
+## 2. Image Commands
+
+| Command | Description |
+|---|---|
+| `docker images` | Lists locally available images |
+| `docker pull nginx` | Downloads the Nginx image |
+| `docker build -t myapp:1.0 .` | Builds an image from the current directory |
+| `docker tag myapp:1.0 myapp:latest` | Adds another tag to an image |
+| `docker rmi nginx` | Removes an image if it is not in use |
+
+### Example: Pull an image
+
+```bash
+docker pull nginx
+docker images
+```
+
+## 3. Container Commands
+
+| Command | Description |
+|---|---|
+| `docker run hello-world` | Runs a test container |
+| `docker run -d --name web nginx` | Runs Nginx in the background |
+| `docker run -d -p 8080:80 --name web nginx` | Maps host port 8080 to container port 80 |
+| `docker run -it ubuntu bash` | Starts an interactive Ubuntu container |
+| `docker start web` | Starts a stopped container |
+| `docker stop web` | Stops a running container |
+| `docker restart web` | Restarts a container |
+| `docker rm web` | Removes a stopped container |
+
+### Example: Run a web server
+
+```bash
+docker run -d -p 8080:80 --name my-nginx nginx
+```
+
+Open this address in your browser:
+
+```text
+http://localhost:8080
+```
+
+**Port mapping:** `8080:80` means host port 8080 forwards to container port 80.
+
+## 4. Container Management
+
+| Command | Description |
+|---|---|
+| `docker exec -it web bash` | Opens a Bash shell inside a running container |
+| `docker exec -it web sh` | Opens a shell when Bash is unavailable |
+| `docker rename web web-server` | Renames a container |
+| `docker cp file.txt web:/tmp/file.txt` | Copies a local file into a container |
+| `docker inspect web` | Displays detailed container configuration |
+
+## 5. Logs and Inspection
+
+| Command | Description |
+|---|---|
+| `docker logs web` | Displays container logs |
+| `docker logs -f web` | Follows logs in real time |
+| `docker stats` | Displays live container resource usage |
+| `docker top web` | Shows processes running inside a container |
+| `docker port web` | Displays published port mappings |
+
+## 6. Cleanup Commands
+
+| Command | Description |
+|---|---|
+| `docker rm web` | Removes a stopped container |
+| `docker rmi myapp:1.0` | Removes an unused image |
+| `docker container prune` | Removes all stopped containers |
+| `docker image prune` | Removes dangling images |
+| `docker system df` | Shows Docker disk usage |
+| `docker system prune` | Removes unused Docker resources |
+
+⚠️ **Warning:** Cleanup commands can remove resources you may want to keep. Review the confirmation prompt and understand what will be deleted before proceeding.
+
+## 7. Docker Compose
+
+Docker Compose helps manage applications that use multiple containers.
+
+| Command | Description |
+|---|---|
+| `docker compose version` | Displays the Compose version |
+| `docker compose up -d` | Creates and starts services in the background |
+| `docker compose ps` | Lists Compose services |
+| `docker compose logs -f` | Follows service logs |
+| `docker compose stop` | Stops services without removing them |
+| `docker compose down` | Stops and removes containers and networks created by Compose |
+
+Run Compose commands in a directory containing a `compose.yaml` or `docker-compose.yml` file.
+
+## ⚠️ Safety Tips
+
+- Avoid running containers with `--privileged` unless necessary.
+- Do not store passwords, API keys, or other secrets in public repositories.
+- Use trusted images and pin versions for reproducible deployments.
+- Check container names before stopping or removing resources.
+- Be cautious with `docker system prune -a` and volume deletion commands.
+
+## 🎯 Practice Project
+
+Run your first Nginx container:
+
+```bash
+# 1. Download the image
+docker pull nginx
+
+# 2. Start the container
+docker run -d -p 8080:80 --name demo-nginx nginx
+
+# 3. Check the running container
+docker ps
+
+# 4. View its logs
+docker logs demo-nginx
+
+# 5. Stop the container
+docker stop demo-nginx
+
+# 6. Remove the stopped container
+docker rm demo-nginx
+```
+
+Visit `http://localhost:8080` while the container is running.
+
+## 📖 Useful Resources
+
+- [Docker Documentation](https://docs.docker.com/)
+- [Docker Get Started Guide](https://docs.docker.com/get-started/)
+- [Docker Hub](https://hub.docker.com/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
+
+---
+
+⭐ If this cheat sheet helps you, consider starring the repository!
+
+**Maintained as a learning resource for Docker and DevOps beginners.**
