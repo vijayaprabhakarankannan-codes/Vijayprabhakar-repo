@@ -1,0 +1,453 @@
+# 🌍 Terraform Notes & Commands Cheat Sheet
+
+A practical guide to Terraform fundamentals, commonly used commands, HCL syntax, and Infrastructure as Code (IaC) examples.
+
+This repository is useful for DevOps beginners, cloud engineers, system administrators, and anyone learning infrastructure automation.
+
+## 📚 Table of Contents
+
+- [What Is Terraform?](#-what-is-terraform)
+- [Why Use Terraform?](#-why-use-terraform)
+- [Key Concepts](#-key-concepts)
+- [Terraform Architecture](#-terraform-architecture)
+- [Terraform Workflow](#-terraform-workflow)
+- [Important Commands](#-important-commands)
+- [Basic HCL Syntax](#-basic-hcl-syntax)
+- [Variables and Outputs](#-variables-and-outputs)
+- [Providers and Resources](#-providers-and-resources)
+- [State File](#-state-file)
+- [Modules](#-modules)
+- [Best Practices](#-best-practices)
+- [Hands-on Practice](#-hands-on-practice)
+- [Interview Questions](#-interview-questions)
+- [Official Resources](#-official-resources)
+
+## 🌍 What Is Terraform?
+
+Terraform is an Infrastructure as Code (IaC) tool developed by HashiCorp.
+
+It allows you to define, provision, and manage infrastructure using configuration files instead of creating resources manually.
+
+Terraform can manage supported resources across cloud platforms and other services, including AWS, Azure, and Google Cloud.
+
+### Example use cases
+
+- Creating cloud virtual machines
+- Managing virtual networks
+- Provisioning storage resources
+- Configuring Kubernetes resources
+- Managing infrastructure consistently across environments
+- Automating infrastructure changes through CI/CD pipelines
+
+## 🚀 Why Use Terraform?
+
+- **Automation:** Provision infrastructure using code.
+- **Consistency:** Reuse configurations across environments.
+- **Version control:** Store infrastructure code in Git.
+- **Planning:** Preview proposed infrastructure changes.
+- **Reusability:** Build reusable modules.
+- **Collaboration:** Share infrastructure definitions with teams.
+
+## 🧠 Key Concepts
+
+| Concept | Explanation |
+|---|---|
+| IaC | Managing infrastructure through code |
+| Provider | Plugin that interacts with a platform or API |
+| Resource | Infrastructure object Terraform manages |
+| Data source | Reads information about existing infrastructure |
+| Variable | Parameterizes configuration |
+| Output | Exposes useful values from configuration |
+| Module | Reusable collection of Terraform configuration |
+| State | Tracks Terraform-managed resource information |
+| Backend | Determines where state is stored and how it is managed |
+| Plan | Proposed set of infrastructure changes |
+| Apply | Executes the planned changes |
+| Destroy | Removes managed infrastructure resources |
+
+## 🏗️ Terraform Architecture
+
+Terraform's main workflow involves three important elements:
+
+1. **Configuration files:** Describe the desired infrastructure.
+2. **Terraform engine:** Reads configuration and compares it with state and remote objects.
+3. **Provider plugins:** Communicate with cloud platforms and other services to perform operations.
+
+Terraform uses its state and refreshed resource information to determine which changes are needed to reach the desired configuration.
+
+## 🔄 Terraform Workflow
+
+The standard workflow is:
+
+```text
+Write Configuration
+        |
+        v
+terraform init
+        |
+        v
+terraform fmt
+        |
+        v
+terraform validate
+        |
+        v
+terraform plan
+        |
+        v
+Review Proposed Changes
+        |
+        v
+terraform apply
+        |
+        v
+Infrastructure Created/Updated
+```
+
+## 💻 Important Terraform Commands
+
+| Command | Purpose |
+|---|---|
+| `terraform version` | Shows the installed version |
+| `terraform -help` | Displays help |
+| `terraform init` | Initializes the working directory |
+| `terraform fmt` | Formats Terraform files |
+| `terraform validate` | Validates configuration syntax and internal consistency |
+| `terraform plan` | Previews proposed infrastructure changes |
+| `terraform apply` | Applies infrastructure changes |
+| `terraform show` | Displays the current state or a saved plan |
+| `terraform output` | Displays root module outputs |
+| `terraform state list` | Lists resources tracked in state |
+| `terraform state show ADDRESS` | Shows details of a state resource |
+| `terraform providers` | Shows provider requirements |
+| `terraform graph` | Produces a dependency graph |
+| `terraform force-unlock LOCK_ID` | Manually releases a state lock when appropriate |
+| `terraform destroy` | Destroys managed infrastructure |
+
+### Useful command examples
+
+```bash
+# Initialize providers and modules
+terraform init
+
+# Format configuration files
+terraform fmt
+
+# Validate configuration
+terraform validate
+
+# Preview changes
+terraform plan
+
+# Apply changes after reviewing the plan
+terraform apply
+
+# Display outputs
+terraform output
+
+# List managed resources
+terraform state list
+```
+
+**Important:** `terraform apply` and `terraform destroy` can change or remove real infrastructure. Review the plan and confirm the target environment before proceeding.
+
+## 📝 Basic HCL Syntax
+
+Terraform uses HashiCorp Configuration Language (HCL).
+
+### Example: `main.tf`
+
+This example creates a local file using the official `hashicorp/local` provider. It is suitable for basic practice without provisioning cloud infrastructure.
+
+```hcl
+terraform {
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
+  }
+}
+
+provider "local" {}
+
+resource "local_file" "example" {
+  filename = "${path.module}/hello.txt"
+  content  = "Hello from Terraform!"
+}
+
+output "file_path" {
+  value = local_file.example.filename
+}
+```
+
+### Explanation
+
+- `terraform`: Configures Terraform and provider requirements.
+- `required_providers`: Declares which provider plugin is required.
+- `provider`: Configures a provider.
+- `resource`: Defines an object Terraform manages.
+- `output`: Exposes a value after operations.
+
+### Run the example
+
+```bash
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+terraform output
+```
+
+Inspect `hello.txt` after applying. Terraform will ask for confirmation unless automatic approval is enabled.
+
+## 🔤 Variables and Outputs
+
+Variables make configurations reusable across environments.
+
+### `variables.tf`
+
+```hcl
+variable "filename" {
+  description = "Name of the output file"
+  type        = string
+  default     = "example.txt"
+}
+```
+
+### `main.tf`
+
+```hcl
+resource "local_file" "example" {
+  filename = "${path.module}/${var.filename}"
+  content  = "Terraform variables example"
+}
+```
+
+### `outputs.tf`
+
+```hcl
+output "created_file" {
+  description = "Path of the created file"
+  value       = local_file.example.filename
+}
+```
+
+### Passing a variable value
+
+```bash
+terraform plan -var="filename=demo.txt"
+terraform apply -var="filename=demo.txt"
+```
+
+Variables can also be supplied using a `terraform.tfvars` file or environment variables. Avoid committing credentials or secrets to version control.
+
+## 🔌 Providers and Resources
+
+A provider allows Terraform to interact with a platform or API.
+
+Examples of provider source addresses include:
+
+- `hashicorp/aws`
+- `hashicorp/azurerm`
+- `hashicorp/google`
+- `hashicorp/kubernetes`
+- `hashicorp/local`
+
+A resource describes an object that Terraform creates or manages.
+
+General structure:
+
+```hcl
+resource "PROVIDER_RESOURCE_TYPE" "LOCAL_NAME" {
+  # Resource arguments
+}
+```
+
+Example:
+
+```hcl
+resource "local_file" "notes" {
+  filename = "${path.module}/notes.txt"
+  content  = "Learning Terraform"
+}
+```
+
+The provider must support the resource type, and provider configuration or credentials may be required depending on the platform.
+
+## 📦 Terraform State File
+
+Terraform state tracks the relationship between configuration and managed objects.
+
+By default, Terraform stores state locally in a file named `terraform.tfstate`.
+
+### Why is state important?
+
+- Tracks resources managed by Terraform.
+- Helps Terraform determine what changes are needed.
+- Stores resource attributes and identifiers.
+- Supports dependency management and resource operations.
+
+### State-related commands
+
+```bash
+terraform state list
+terraform state show local_file.notes
+terraform show
+terraform state pull
+```
+
+### State file best practices
+
+- Never commit state files containing sensitive data to a public repository.
+- Use a suitable remote backend for team environments.
+- Enable access controls, encryption, and state locking where supported.
+- Back up state and restrict access.
+- Do not manually edit state unless you understand the consequences.
+
+State may contain sensitive values even when they are not displayed as outputs.
+
+## 🧩 Terraform Modules
+
+A module is a collection of Terraform configuration files that work together as a reusable unit.
+
+The root module is the configuration in your working directory. Child modules are called from other modules.
+
+### Example directory structure
+
+```text
+terraform-project/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── providers.tf
+├── terraform.tfvars
+└── modules/
+    └── local-file/
+        ├── main.tf
+        ├── variables.tf
+        └── outputs.tf
+```
+
+### Why use modules?
+
+- Reuse configuration.
+- Keep projects organized.
+- Standardize infrastructure.
+- Simplify maintenance.
+- Share common patterns across environments.
+
+## 🔒 Best Practices
+
+- Use version control for Terraform configuration.
+- Run `terraform fmt`, `terraform validate`, and `terraform plan`.
+- Review plans before applying changes.
+- Pin provider versions and use a dependency lock file.
+- Use variables instead of hardcoding environment-specific values.
+- Keep credentials outside configuration files and repositories.
+- Use remote state with appropriate security and locking for team projects.
+- Avoid editing state files manually.
+- Test infrastructure changes in a non-production environment first.
+- Use modules for repeated infrastructure patterns.
+- Treat saved plan files and state files as potentially sensitive.
+
+## 🧪 Hands-on Practice
+
+Create a directory and add the following `main.tf` file:
+
+```hcl
+terraform {
+  required_providers {
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
+    }
+  }
+}
+
+provider "local" {}
+
+resource "local_file" "practice" {
+  filename = "${path.module}/practice.txt"
+  content  = "My first Terraform project"
+}
+```
+
+Run these commands in that directory:
+
+```bash
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+```
+
+Verify that `practice.txt` was created.
+
+To clean up the resource managed by this example:
+
+```bash
+terraform destroy
+```
+
+Review the proposed destruction and confirm it. This removes the file managed by the resource; it does not delete your Terraform configuration.
+
+## 🎯 Interview Questions
+
+**1. What is Terraform?**
+
+Terraform is an Infrastructure as Code tool used to define and manage infrastructure through configuration files.
+
+**2. What is a provider?**
+
+A provider is a plugin that allows Terraform to interact with a platform, service, or API.
+
+**3. What is Terraform state?**
+
+State records information Terraform uses to track managed resources and compare them with configuration.
+
+**4. What is the difference between `plan` and `apply`?**
+
+`plan` previews proposed changes. `apply` executes those changes after approval or according to the configured workflow.
+
+**5. What is a module?**
+
+A module is a reusable collection of Terraform configuration files.
+
+**6. What is the purpose of `terraform init`?**
+
+It initializes the working directory and installs required providers and modules.
+
+**7. What is a backend?**
+
+A backend determines where Terraform stores state and how state operations are handled.
+
+**8. What is the purpose of `terraform fmt`?**
+
+It formats Terraform configuration files consistently.
+
+**9. What is the difference between a resource and a data source?**
+
+A resource manages an object, while a data source reads information about an existing object or external information.
+
+**10. Why should state files be protected?**
+
+They can contain sensitive information and are essential to safely managing infrastructure.
+
+## 📚 Official Resources
+
+- [Terraform Documentation](https://developer.hashicorp.com/terraform/docs)
+- [Terraform Language](https://developer.hashicorp.com/terraform/language)
+- [Terraform CLI Commands](https://developer.hashicorp.com/terraform/cli/commands)
+- [Terraform Tutorials](https://developer.hashicorp.com/terraform/tutorials)
+- [Terraform Registry](https://registry.terraform.io/)
+
+## ⭐ Contributing
+
+Suggestions and improvements are welcome. Fork the repository and submit a pull request.
+
+If this guide helps you learn Terraform, consider starring the repository.
+
+**Happy Learning! 🚀**
