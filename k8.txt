@@ -1,0 +1,4 @@
+This text file will you can check the K8 details.
+
+in feature we will add more details.
+
