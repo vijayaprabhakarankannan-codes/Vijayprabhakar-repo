@@ -1,7 +1,6 @@
 Welcome! 😊 Here are 20 useful Linux commands for beginners, with examples and explanations.
-20 Basic Linux Commands
-No.	Command	What it does
-1	pwd	Shows your current directory
+
+1	pwd	-Shows your current directory
 2	ls	Lists files and folders
 3	ls -l	Shows files in detailed format
 4	ls -a	Shows hidden files too
