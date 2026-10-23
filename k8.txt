@@ -1,1 +1,354 @@
 
+# ☸️ Kubernetes (K8s) Commands & Basic Notes
+
+A beginner-friendly Kubernetes cheat sheet covering essential `kubectl` commands, core concepts, YAML examples, and hands-on practice.
+
+Useful for Linux administrators, DevOps engineers, cloud learners, and Kubernetes beginners.
+
+## 📚 Table of Contents
+
+- [What Is Kubernetes?](#-what-is-kubernetes)
+- [Kubernetes Architecture](#-kubernetes-architecture)
+- [Basic Kubernetes Concepts](#-basic-kubernetes-concepts)
+- [1. Cluster Information](#1-cluster-information)
+- [2. Pod Commands](#2-pod-commands)
+- [3. Deployment Commands](#3-deployment-commands)
+- [4. Service Commands](#4-service-commands)
+- [5. Namespace Commands](#5-namespace-commands)
+- [6. Troubleshooting Commands](#6-troubleshooting-commands)
+- [7. Scaling and Rollouts](#7-scaling-and-rollouts)
+- [8. YAML Examples](#8-yaml-examples)
+- [9. Hands-on Practice](#9-hands-on-practice)
+- [10. Important Tips](#10-important-tips)
+
+## ☸️ What Is Kubernetes?
+
+Kubernetes is an open-source platform for deploying, scaling, and managing containerized applications.
+
+It helps you:
+- Deploy applications across a cluster of machines.
+- Restart failed containers and maintain desired replica counts.
+- Scale applications up or down.
+- Discover and connect services.
+- Perform controlled application rollouts and rollbacks.
+
+**kubectl** is the command-line tool used to interact with a Kubernetes cluster.
+
+## 🏗️ Kubernetes Architecture
+
+### Control Plane
+
+The control plane manages the cluster.
+
+| Component | Purpose |
+|---|---|
+| API Server | Entry point for Kubernetes API requests |
+| etcd | Stores cluster state and configuration data |
+| Scheduler | Selects nodes for newly scheduled Pods |
+| Controller Manager | Runs controllers that reconcile desired state |
+
+### Worker Node
+
+Worker nodes run application workloads.
+
+| Component | Purpose |
+|---|---|
+| Kubelet | Ensures assigned Pods run as expected |
+| Container Runtime | Runs containers, such as containerd |
+| Network Components | Enable Pod networking and Service connectivity |
+
+## 📖 Basic Kubernetes Concepts
+
+| Concept | Explanation |
+|---|---|
+| Cluster | A group of machines managed by Kubernetes |
+| Node | A machine in the cluster |
+| Pod | The smallest deployable Kubernetes unit |
+| Deployment | Manages replicated application Pods and updates |
+| ReplicaSet | Maintains a desired number of Pod replicas |
+| Service | Provides a stable way to access a group of Pods |
+| Namespace | Organizes resources within a cluster |
+| ConfigMap | Stores non-sensitive configuration data |
+| Secret | Stores sensitive configuration data; protect access appropriately |
+| Ingress | Manages HTTP/HTTPS routing into a cluster when an Ingress controller is installed |
+| PersistentVolume (PV) | Represents storage available to the cluster |
+| PersistentVolumeClaim (PVC) | Requests storage for a workload |
+
+## 1. Cluster Information
+
+| Command | Description |
+|---|---|
+| `kubectl version` | Displays client and server version information |
+| `kubectl cluster-info` | Shows cluster endpoint information |
+| `kubectl get nodes` | Lists cluster nodes |
+| `kubectl describe node NODE_NAME` | Shows details about a node |
+| `kubectl get namespaces` | Lists namespaces |
+| `kubectl config get-contexts` | Lists configured cluster contexts |
+| `kubectl config current-context` | Shows the active context |
+| `kubectl get all -A` | Lists common resource types across namespaces |
+
+## 2. Pod Commands
+
+Pods run one or more closely related containers.
+
+| Command | Description |
+|---|---|
+| `kubectl get pods` | Lists Pods in the current namespace |
+| `kubectl get pods -A` | Lists Pods in all namespaces |
+| `kubectl get pods -o wide` | Shows additional Pod details |
+| `kubectl describe pod POD_NAME` | Shows Pod configuration and events |
+| `kubectl logs POD_NAME` | Displays container logs |
+| `kubectl logs -f POD_NAME` | Streams container logs |
+| `kubectl exec -it POD_NAME -- sh` | Opens a shell inside a container |
+| `kubectl delete pod POD_NAME` | Deletes a Pod |
+| `kubectl get pods --watch` | Watches Pod changes |
+
+For a Pod with multiple containers, specify the container using `-c CONTAINER_NAME` with commands such as `logs` and `exec`.
+
+## 3. Deployment Commands
+
+A Deployment manages application replicas and supports rolling updates.
+
+| Command | Description |
+|---|---|
+| `kubectl get deployments` | Lists Deployments |
+| `kubectl create deployment nginx --image=nginx` | Creates a Deployment |
+| `kubectl describe deployment nginx` | Shows Deployment details |
+| `kubectl scale deployment nginx --replicas=3` | Sets the desired replica count to three |
+| `kubectl set image deployment/nginx nginx=nginx:1.28` | Updates the container image |
+| `kubectl rollout status deployment/nginx` | Checks rollout progress |
+| `kubectl rollout history deployment/nginx` | Displays rollout history |
+| `kubectl rollout undo deployment/nginx` | Attempts to roll back the last rollout |
+| `kubectl delete deployment nginx` | Deletes the Deployment |
+
+Use an image version appropriate for your environment instead of relying on the `latest` tag.
+
+## 4. Service Commands
+
+Services provide stable network access to application Pods.
+
+| Command | Description |
+|---|---|
+| `kubectl get services` | Lists Services |
+| `kubectl describe service SERVICE_NAME` | Shows Service details |
+| `kubectl expose deployment nginx --port=80 --type=ClusterIP` | Exposes a Deployment internally |
+| `kubectl expose deployment nginx --port=80 --type=NodePort` | Creates a NodePort Service |
+| `kubectl get endpointslices` | Lists EndpointSlices |
+| `kubectl port-forward service/nginx 8080:80` | Forwards local port 8080 to Service port 80 |
+
+A `NodePort` Service uses a port on cluster nodes. Whether that port is reachable externally depends on the cluster network and firewall configuration.
+
+## 5. Namespace Commands
+
+Namespaces help organize resources within a cluster.
+
+| Command | Description |
+|---|---|
+| `kubectl get ns` | Lists namespaces |
+| `kubectl create namespace dev` | Creates a namespace |
+| `kubectl get pods -n dev` | Lists Pods in the `dev` namespace |
+| `kubectl apply -f app.yaml -n dev` | Applies a manifest in the `dev` namespace |
+| `kubectl config set-context --current --namespace=dev` | Sets the default namespace for the current context |
+| `kubectl delete namespace dev` | Deletes the namespace and its namespaced resources |
+
+**Warning:** Deleting a namespace can delete many resources. Verify the namespace before running destructive commands.
+
+## 6. Troubleshooting Commands
+
+| Command | Description |
+|---|---|
+| `kubectl get events --sort-by=.metadata.creationTimestamp` | Lists events in chronological order |
+| `kubectl describe pod POD_NAME` | Shows Pod status, conditions, and events |
+| `kubectl logs POD_NAME --previous` | Shows logs from the previous container instance, when available |
+| `kubectl get pods -o wide` | Shows Pod placement and IP information |
+| `kubectl top nodes` | Displays node CPU and memory usage when Metrics Server is available |
+| `kubectl top pods` | Displays Pod resource usage when metrics are available |
+| `kubectl get deployment` | Checks Deployment status |
+| `kubectl get pods -w` | Watches Pod status changes |
+
+### Common Pod statuses
+
+| Status | Meaning |
+|---|---|
+| `Pending` | The Pod has not finished scheduling or setup |
+| `Running` | The Pod is bound to a node and its containers are running or starting |
+| `CrashLoopBackOff` | A container repeatedly fails and is restarted with backoff |
+| `ImagePullBackOff` | Kubernetes is having trouble pulling an image |
+| `Completed` | The Pod's containers finished successfully |
+| `ErrImagePull` | An image pull attempt failed |
+
+When a Pod fails, start with `kubectl describe pod POD_NAME` and `kubectl logs POD_NAME`.
+
+## 7. Scaling and Rollouts
+
+```bash
+# Scale an application
+kubectl scale deployment nginx --replicas=5
+
+# Check the rollout
+kubectl rollout status deployment/nginx
+
+# View deployment history
+kubectl rollout history deployment/nginx
+
+# Roll back the last rollout
+kubectl rollout undo deployment/nginx
+
+# Restart Pods managed by a Deployment
+kubectl rollout restart deployment/nginx
+```
+
+A rollback is only useful when a previous Deployment revision is available.
+
+## 8. YAML Examples
+
+Kubernetes manifests describe the desired state of resources.
+
+### Example 1: Pod
+
+Save as `pod.yaml`.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.28
+      ports:
+        - containerPort: 80
+```
+
+Apply and inspect:
+
+```bash
+kubectl apply -f pod.yaml
+kubectl get pods
+kubectl describe pod nginx-pod
+```
+
+### Example 2: Deployment
+
+Save as `deployment.yaml`.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.28
+          ports:
+            - containerPort: 80
+```
+
+Apply it:
+
+```bash
+kubectl apply -f deployment.yaml
+kubectl get deployments
+kubectl get pods
+```
+
+### Example 3: Service
+
+Save as `service.yaml`.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+```
+
+Apply it:
+
+```bash
+kubectl apply -f service.yaml
+kubectl get services
+```
+
+The Service selects Pods with the label `app: nginx`. Apply the Deployment manifest first so those Pods exist.
+
+## 9. Hands-on Practice
+
+Try this mini project in a Kubernetes development cluster.
+
+```bash
+# 1. Create a namespace
+kubectl create namespace practice
+
+# 2. Create an Nginx Deployment
+kubectl create deployment nginx --image=nginx:1.28 -n practice
+
+# 3. Scale it to three replicas
+kubectl scale deployment nginx --replicas=3 -n practice
+
+# 4. Check the Deployment
+kubectl get deployments -n practice
+
+# 5. Check the Pods
+kubectl get pods -n practice -o wide
+
+# 6. Expose the application internally
+kubectl expose deployment nginx --port=80 --type=ClusterIP -n practice
+
+# 7. Forward a local port
+kubectl port-forward service/nginx 8080:80 -n practice
+```
+
+While port forwarding is active, open `http://localhost:8080` in your browser. Stop port forwarding with `Ctrl+C`.
+
+Clean up when finished:
+
+```bash
+kubectl delete namespace practice
+```
+
+## 10. Important Tips
+
+- Use `kubectl apply -f FILE.yaml` to manage resources declaratively.
+- Use `kubectl get` to inspect resources and `kubectl describe` to investigate them.
+- Use namespaces to separate workloads and environments.
+- Avoid putting passwords or tokens directly in public YAML files.
+- Kubernetes Secrets require appropriate access controls and may need encryption at rest.
+- Check your current context before modifying a cluster: `kubectl config current-context`.
+- Practice destructive commands in a local or test cluster first.
+- Use resource requests and limits to manage workload resource consumption.
+
+## 📚 Official Resources
+
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [kubectl Command Reference](https://kubernetes.io/docs/reference/kubectl/)
+- [Kubernetes Concepts](https://kubernetes.io/docs/concepts/)
+- [Kubernetes Tutorials](https://kubernetes.io/docs/tutorials/)
+
+## ⭐ Contributing
+
+Suggestions and improvements are welcome. Feel free to fork this repository and submit a pull request.
+
+If this cheat sheet helps you learn Kubernetes, consider starring the repository.
+
+**Happy Learning! 🚀**
