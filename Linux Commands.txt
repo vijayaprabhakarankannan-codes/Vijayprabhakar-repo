@@ -1,1 +1,23 @@
-This File included Linux comands
+Welcome! 😊 Here are 20 useful Linux commands for beginners, with examples and explanations.
+20 Basic Linux Commands
+No.	Command	What it does
+1	pwd	Shows your current directory
+2	ls	Lists files and folders
+3	ls -l	Shows files in detailed format
+4	ls -a	Shows hidden files too
+5	cd Documents	Moves into the Documents folder
+6	cd ..	Moves to the parent directory
+7	mkdir test	Creates a new folder named test
+8	touch file.txt	Creates an empty file
+9	cat file.txt	Displays file contents
+10	nano file.txt	Opens a text editor
+11	cp file.txt copy.txt	Copies a file
+12	mv file.txt new.txt	Renames or moves a file
+13	rm file.txt	Deletes a file
+14	rmdir test	Removes an empty directory
+15	clear	Clears the terminal screen
+16	whoami	Shows your current username
+17	date	Displays the current date and time
+18	cal	Displays a calendar (if installed)
+19	df -h	Shows disk space usage
+20	free -h	Shows memory (RAM) usage
